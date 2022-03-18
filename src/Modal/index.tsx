@@ -61,6 +61,7 @@ export default function Modal({
 					value={title}
 					onChange={onTitleChange}
 					error={titleError}
+					helperText={titleError && "Title already exists or empty"}
 				/>
 				<TextField
 					className="input"
@@ -71,6 +72,7 @@ export default function Modal({
 					value={url}
 					onChange={onUrlChange}
 					error={urlError}
+					helperText={urlError && "Url already exists or invalid"}
 				/>
 				<TextField
 					className="input"
