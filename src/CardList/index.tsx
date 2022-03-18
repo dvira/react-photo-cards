@@ -70,7 +70,8 @@ export default function CardList() {
 	const handleClickAdd = async () => {
 		try {
 			const json = await fetchPhotos();
-			const [card] = json.slice(photos.length, photos.length + 1);
+			const lastPhotoId = photos[photos.length -1].id;
+			const [card] = json.slice(lastPhotoId, lastPhotoId + 1);
 			setTitle(card.title);
 			setUrl(card.url);
 			setId(card.id);
