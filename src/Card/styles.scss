@@ -3,28 +3,28 @@
 	height: 200px;
 	padding: 10px;
 	margin: 5px;
-}
 
-.photo {
-	display: block;
-	width: 100%;
-	height: 140px;
-	object-fit: cover;
-}
+	.photo {
+		display: block;
+		width: 100%;
+		height: 140px;
+		object-fit: cover;
+	}
 
-.title {
-	font-size: 14px;
-	line-height: 20px;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	overflow: hidden;
-	padding: 5px 0;
-}
+	.title {
+		font-size: 14px;
+		line-height: 20px;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		padding: 5px 0;
+	}
 
-.edit-btn {
-	padding: 0 12px;
-	height: 30px;
-	font-size: 14px;
-	line-height: 24px;
-	min-width: unset;
+	.edit-btn {
+		padding: 0 12px;
+		height: 30px;
+		font-size: 14px;
+		line-height: 24px;
+		min-width: unset;
+	}
 }

@@ -5,7 +5,7 @@ import { Photo } from "../CardList";
 import "./styles.scss";
 
 interface CardProps extends Photo {
-	onEdit: (id: Photo) => void;
+	onEdit: (card: Photo) => void;
 }
 
 export default function Card({ id, title, url, onEdit }: CardProps) {
