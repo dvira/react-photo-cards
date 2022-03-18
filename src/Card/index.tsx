@@ -6,9 +6,10 @@ import "./styles.scss";
 
 interface CardProps extends Photo {
 	onEdit: (card: Photo) => void;
+	onDelete: (id: number) => void;
 }
 
-export default function Card({ id, title, url, onEdit }: CardProps) {
+export default function Card({ id, title, url, onEdit, onDelete }: CardProps) {
 	return (
 		<MuiCard className="card">
 			<img className="photo" src={url} alt={title} />
@@ -16,13 +17,22 @@ export default function Card({ id, title, url, onEdit }: CardProps) {
 				{title}
 			</Typography>
 			<Button
-				className="edit-btn"
+				className="btn"
 				variant="contained"
 				disableElevation
 				disableRipple
 				onClick={() => onEdit({ id, title, url })}
 			>
 				Edit
+			</Button>
+			<Button
+				className="btn"
+				variant="contained"
+				disableElevation
+				disableRipple
+				onClick={() => onDelete(id)}
+			>
+				Delete
 			</Button>
 		</MuiCard>
 	);

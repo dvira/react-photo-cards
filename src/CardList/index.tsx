@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import Card from "../Card";
+import DeleteCardModal from "../DeleteCardModal";
 import EditCardModal from "../EditCardModal";
 
 import "./styles.scss";
@@ -30,36 +31,52 @@ export default function CardList() {
 		fetchPhotos();
 	}, [fetchPhotos]);
 
-	const [open, setOpen] = useState(false);
-
-	const handleClose = () => {
-		setOpen(false);
-	};
-
+	const [openEditModal, setOpenEditModal] = useState(false);
 	const [title, setTitle] = useState<string>();
 	const [url, setUrl] = useState<string>();
 	const [id, setId] = useState<number>();
 
-	const onEdit = (card: Photo) => {
+	const handleEdit = (card: Photo) => {
 		setTitle(card.title);
 		setUrl(card.url);
 		setId(card.id);
-		setOpen(true);
+		setOpenEditModal(true);
 	};
 
 	const handleSave = (newPhotos: Photo[]) => {
 		setPhotos(newPhotos);
-		setOpen(false);
+		setOpenEditModal(false);
+	};
+
+	const [openDeleteModal, setOpenDeleteModal] = useState(false);
+	const [deleteId, setDeleteId] = useState<number>();
+
+	const handleDelete = (id: number) => {
+		setDeleteId(id);
+		setOpenDeleteModal(true);
+	};
+
+	const handleConfirmDelete = () => {
+		const newPhotos = photos.filter((photo) => photo.id !== deleteId);
+		setPhotos(newPhotos);
+		setOpenDeleteModal(false);
 	};
 
 	return (
 		<div className="card-list">
 			{photos.map(({ id, url, title }) => (
-				<Card key={id} id={id} url={url} title={title} onEdit={onEdit} />
+				<Card
+					key={id}
+					id={id}
+					url={url}
+					title={title}
+					onEdit={handleEdit}
+					onDelete={handleDelete}
+				/>
 			))}
 			<EditCardModal
-				open={open}
-				onClose={handleClose}
+				open={openEditModal}
+				onClose={() => setOpenEditModal(false)}
 				onSave={handleSave}
 				photos={photos}
 				title={title}
@@ -67,6 +84,11 @@ export default function CardList() {
 				url={url}
 				onUrlChange={(e) => setUrl(e.target.value)}
 				id={id}
+			/>
+			<DeleteCardModal
+				open={openDeleteModal}
+				onClose={() => setOpenDeleteModal(false)}
+				onConfirm={handleConfirmDelete}
 			/>
 		</div>
 	);
