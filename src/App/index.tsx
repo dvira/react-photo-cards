@@ -1,5 +1,11 @@
+import CardList from "../CardList";
+
 import "./styles.scss";
 
 export default function App() {
-	return <div className="app">Hello World</div>;
+	return (
+		<div className="app">
+			<CardList />
+		</div>
+	);
 }
