@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Dialog, DialogTitle, TextField, Button } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
 
 import Card from "../Card";
+import EditCardModal from "../EditCardModal";
 
 import "./styles.scss";
 
@@ -47,32 +47,7 @@ export default function CardList() {
 		setOpen(true);
 	};
 
-	const titleError = useMemo(() => {
-		const isEmpty = title?.trim() === "";
-		const titleAlreadyExists = photos
-			.filter((photo) => photo.id !== id)
-			.some((photo) => photo.title === title);
-
-		return isEmpty || titleAlreadyExists;
-	}, [id, photos, title]);
-
-	const urlError = useMemo(() => {
-		const isValidUrl =
-			/^https:\/\/via\.placeholder\.com\/600\/([a-z0-9]){6}$/.test(url ?? "");
-		const urlAlreadyExists = photos
-			.filter((photo) => photo.id !== id)
-			.some((photo) => photo.url === url);
-
-		return !isValidUrl || urlAlreadyExists;
-	}, [id, photos, url]);
-
-	const handleSave = () => {
-		const newPhotos = [...photos];
-		const idx = photos.findIndex((photo) => photo.id === id);
-
-		if (!id || !url || !title) return;
-
-		newPhotos[idx] = { title, url, id };
+	const handleSave = (newPhotos: Photo[]) => {
 		setPhotos(newPhotos);
 		setOpen(false);
 	};
@@ -82,53 +57,17 @@ export default function CardList() {
 			{photos.map(({ id, url, title }) => (
 				<Card key={id} id={id} url={url} title={title} onEdit={onEdit} />
 			))}
-			<Dialog open={open} onClose={handleClose}>
-				<DialogTitle className="dialog-title">Edit Card</DialogTitle>
-				<div className="dialog-content">
-					<TextField
-						className="input"
-						id="title"
-						label="Title"
-						fullWidth
-						variant="standard"
-						value={title}
-						onChange={(e) => setTitle(e.target.value)}
-						error={titleError}
-					/>
-					<TextField
-						className="input"
-						id="url"
-						label="Url"
-						fullWidth
-						variant="standard"
-						value={url}
-						onChange={(e) => setUrl(e.target.value)}
-						error={urlError}
-					/>
-					<TextField
-						className="input"
-						id="id"
-						label="ID"
-						fullWidth
-						variant="standard"
-						value={id}
-						disabled
-					/>
-				</div>
-				<div className="dialog-actions">
-					<Button className="dialog-btn" onClick={handleClose} disableRipple>
-						Cancel
-					</Button>
-					<Button
-						className="dialog-btn"
-						onClick={handleSave}
-						disableRipple
-						disabled={titleError || urlError}
-					>
-						Save
-					</Button>
-				</div>
-			</Dialog>
+			<EditCardModal
+				open={open}
+				onClose={handleClose}
+				onSave={handleSave}
+				photos={photos}
+				title={title}
+				onTitleChange={(e) => setTitle(e.target.value)}
+				url={url}
+				onUrlChange={(e) => setUrl(e.target.value)}
+				id={id}
+			/>
 		</div>
 	);
 }
