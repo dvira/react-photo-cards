@@ -5,26 +5,30 @@ import { Photo } from "../CardList";
 
 import "./styles.scss";
 
-export interface EditCardModalProps extends Partial<Photo> {
+export interface ModalProps extends Partial<Photo> {
 	open: boolean;
 	onClose: () => void;
-	onSave: (photos: Photo[]) => void;
+	applyLabel: string;
+	onApply: () => void;
+	modalTitle: string;
 	photos: Photo[];
 	onTitleChange: (e: ChangeEvent<HTMLInputElement>) => void;
 	onUrlChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function EditCardModal({
+export default function Modal({
 	open,
 	onClose,
-	onSave,
+	applyLabel,
+	onApply,
+	modalTitle,
 	photos,
 	title,
 	onTitleChange,
 	url,
 	onUrlChange,
 	id,
-}: EditCardModalProps) {
+}: ModalProps) {
 	const titleError = useMemo(() => {
 		const isEmpty = title?.trim() === "";
 		const titleAlreadyExists = photos
@@ -44,19 +48,9 @@ export default function EditCardModal({
 		return !isValidUrl || urlAlreadyExists;
 	}, [id, photos, url]);
 
-	const handleSave = () => {
-		const newPhotos = [...photos];
-		const idx = photos.findIndex((photo) => photo.id === id);
-
-		if (!id || !url || !title) return;
-
-		newPhotos[idx] = { title, url, id };
-		onSave(newPhotos);
-	};
-
 	return (
-		<Dialog className="edit-card-modal" open={open} onClose={onClose}>
-			<DialogTitle className="title">Edit Card</DialogTitle>
+		<Dialog className="modal" open={open} onClose={onClose}>
+			<DialogTitle className="title">{modalTitle}</DialogTitle>
 			<div className="content">
 				<TextField
 					className="input"
@@ -94,11 +88,11 @@ export default function EditCardModal({
 				</Button>
 				<Button
 					className="btn"
-					onClick={handleSave}
+					onClick={onApply}
 					disableRipple
 					disabled={titleError || urlError}
 				>
-					Save
+					{applyLabel}
 				</Button>
 			</div>
 		</Dialog>

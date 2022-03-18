@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { Button, Typography } from "@mui/material";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import Card from "../Card";
 import DeleteCardModal from "../DeleteCardModal";
-import EditCardModal from "../EditCardModal";
+import Modal from "../Modal";
 
 import "./styles.scss";
+
+const fetchPhotos = async () => {
+	const response = await fetch("https://jsonplaceholder.typicode.com/photos");
+
+	return await response.json();
+};
 
 export interface Photo {
 	id: number;
@@ -15,26 +22,30 @@ export interface Photo {
 export default function CardList() {
 	const [photos, setPhotos] = useState<Photo[]>([]);
 
-	const fetchPhotos = useCallback(async () => {
-		try {
-			const response = await fetch(
-				"https://jsonplaceholder.typicode.com/photos",
-			);
-			const json = await response.json();
-			setPhotos(json.slice(0, 20));
-		} catch (e) {
-			console.error(e);
-		}
+	useEffect(() => {
+		(async () => {
+			try {
+				const json = await fetchPhotos();
+				setPhotos(json.slice(0, 10));
+			} catch (e) {
+				console.error(e);
+			}
+		})();
 	}, []);
 
-	useEffect(() => {
-		fetchPhotos();
-	}, [fetchPhotos]);
-
-	const [openEditModal, setOpenEditModal] = useState(false);
 	const [title, setTitle] = useState<string>();
 	const [url, setUrl] = useState<string>();
 	const [id, setId] = useState<number>();
+
+	const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setTitle(e.target.value);
+	};
+
+	const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setUrl(e.target.value);
+	};
+
+	const [openEditModal, setOpenEditModal] = useState(false);
 
 	const handleEdit = (card: Photo) => {
 		setTitle(card.title);
@@ -43,9 +54,40 @@ export default function CardList() {
 		setOpenEditModal(true);
 	};
 
-	const handleSave = (newPhotos: Photo[]) => {
+	const handleSave = () => {
+		const newPhotos = [...photos];
+		const idx = photos.findIndex((photo) => photo.id === id);
+
+		if (!id || !url || !title) return;
+
+		newPhotos[idx] = { title, url, id };
 		setPhotos(newPhotos);
 		setOpenEditModal(false);
+	};
+
+	const [openAddModal, setOpenAddModal] = useState(false);
+
+	const handleClickAdd = async () => {
+		try {
+			const json = await fetchPhotos();
+			const [card] = json.slice(photos.length, photos.length + 1);
+			setTitle(card.title);
+			setUrl(card.url);
+			setId(card.id);
+			setOpenAddModal(true);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
+	const handleApplyAdd = () => {
+		const newPhotos = [...photos];
+
+		if (!id || !url || !title) return;
+
+		newPhotos.push({ title, url, id });
+		setPhotos(newPhotos);
+		setOpenAddModal(false);
 	};
 
 	const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -64,31 +106,62 @@ export default function CardList() {
 
 	return (
 		<div className="card-list">
-			{photos.map(({ id, url, title }) => (
-				<Card
-					key={id}
-					id={id}
-					url={url}
-					title={title}
-					onEdit={handleEdit}
-					onDelete={handleDelete}
-				/>
-			))}
-			<EditCardModal
+			<header className="header">
+				<Typography className="title" component="h1">
+					Card List
+				</Typography>
+				<Button
+					className="btn"
+					variant="contained"
+					disableElevation
+					disableRipple
+					onClick={handleClickAdd}
+				>
+					Add
+				</Button>
+			</header>
+			<div className="cards">
+				{photos.map(({ id, url, title }) => (
+					<Card
+						key={id}
+						id={id}
+						url={url}
+						title={title}
+						onEdit={handleEdit}
+						onDelete={handleDelete}
+					/>
+				))}
+			</div>
+			<Modal
 				open={openEditModal}
 				onClose={() => setOpenEditModal(false)}
-				onSave={handleSave}
+				applyLabel="Save"
+				onApply={handleSave}
+				modalTitle="Edit Card"
 				photos={photos}
 				title={title}
-				onTitleChange={(e) => setTitle(e.target.value)}
+				onTitleChange={handleTitleChange}
 				url={url}
-				onUrlChange={(e) => setUrl(e.target.value)}
+				onUrlChange={handleUrlChange}
 				id={id}
 			/>
 			<DeleteCardModal
 				open={openDeleteModal}
 				onClose={() => setOpenDeleteModal(false)}
 				onConfirm={handleConfirmDelete}
+			/>
+			<Modal
+				open={openAddModal}
+				onClose={() => setOpenAddModal(false)}
+				applyLabel="Add"
+				onApply={handleApplyAdd}
+				modalTitle="Add Card"
+				photos={photos}
+				title={title}
+				onTitleChange={handleTitleChange}
+				url={url}
+				onUrlChange={handleUrlChange}
+				id={id}
 			/>
 		</div>
 	);
